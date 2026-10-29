@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scribbi - IGCSE Study Helper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-area" id="logoHomeBtn">
+        <span class="logo-icon">✏️</span>
+        <h1 class="app-title">Scribbi</h1>
+      </div>
+      <span class="tagline">IGCSE Study Assistant</span>
+    </header>
+
+    <!-- STEP 1: Upload View -->
+    <section id="uploadSection" class="view-section active">
+      <div class="upload-card">
+        <div class="drop-zone" id="dropZone">
+          <div class="upload-icon">📄</div>
+          <h2>Upload question paper</h2>
+          <p class="upload-sub">PDF or photo (PNG, JPG)</p>
+          <input type="file" id="fileInput" accept="application/pdf,image/*" class="file-input" />
+          <button type="button" class="btn btn-primary" id="browseBtn">Choose File</button>
+        </div>
+      </div>
+      <div class="fallback-link-container">
+        <button type="button" id="manualDetailsBtn" class="btn-link">Wrong info or missing paper? Enter details manually</button>
+      </div>
+    </section>
+
+    <!-- STEP 2: Progress & Questions View -->
+    <section id="paperViewSection" class="view-section">
+      <!-- Progress Bar -->
+      <div class="progress-box" id="progressBox">
+        <div class="progress-steps">
+          <span class="step-dot active" id="step1Dot">1</span>
+          <span class="step-text" id="stepText">Reading paper...</span>
+        </div>
+        <div class="progress-line-container">
+          <div class="progress-line-fill" id="progressLineFill"></div>
+        </div>
+      </div>
+
+      <!-- Paper Details Banner -->
+      <div class="paper-meta-card hidden" id="paperMetaCard">
+        <div class="meta-info">
+          <span class="badge badge-board" id="metaBoard">CAMBRIDGE</span>
+          <span class="meta-title" id="metaTitle">Biology (0610) Paper 42</span>
+          <span class="meta-sub" id="metaSub">May/June 2023</span>
+        </div>
+        <button type="button" id="editMetaBtn" class="btn-icon" title="Edit details">✏️</button>
+      </div>
+
+      <!-- Question List -->
+      <div class="questions-container hidden" id="questionsContainer">
+        <div class="questions-header">
+          <h3>Select a Question:</h3>
+          <span class="questions-count" id="qCount">0 Questions</span>
+        </div>
+        <div class="questions-grid" id="questionsGrid"></div>
+      </div>
+    </section>
+
+    <!-- STEP 3: Answer View -->
+    <section id="answerSection" class="view-section">
+      <div class="nav-back-bar">
+        <button type="button" id="backToQuestionsBtn" class="btn btn-secondary btn-sm">&larr; Back to Questions</button>
+        <div class="view-toggle">
+          <button type="button" id="togglePlainTextBtn" class="btn btn-toggle">Show plain text</button>
+        </div>
+      </div>
+
+      <!-- Question Title Header -->
+      <div class="answer-header-card">
+        <div class="q-badge" id="ansQNumber">Q1</div>
+        <div class="q-summary-area">
+          <h2 id="ansQSummary">Question summary</h2>
+          <span class="q-marks-tag" id="ansQMarks">4 Marks</span>
+        </div>
+      </div>
+
+      <!-- Source Badge -->
+      <div class="source-badge-container" id="sourceBadgeContainer">
+        <!-- Injected via JS -->
+      </div>
+
+      <!-- Answer Card Container (Handwriting / Notebook Mode) -->
+      <div class="notebook-container handwriting-mode" id="notebookContainer">
+        <div class="notebook-paper" id="notebookPaper">
+          <div class="notebook-margin"></div>
+          <div class="notebook-content" id="notebookContent">
+            <!-- Answer steps and mark breakdown injected here -->
+          </div>
+        </div>
+
+        <!-- Diagram Column if present -->
+        <div class="diagram-card hidden" id="diagramCard">
+          <div class="diagram-header">
+            <span>Diagram / Visualization</span>
+            <button type="button" id="redrawDiagramBtn" class="btn btn-secondary btn-xs">🔄 Redraw diagram</button>
+          </div>
+          <div class="diagram-svg-container" id="diagramSvgContainer"></div>
+        </div>
+      </div>
+
+      <!-- Follow-up Box -->
+      <div class="followup-card">
+        <h4>Have a question about this answer?</h4>
+        <div class="quick-pills">
+          <button type="button" class="pill-btn" data-type="simpler">💡 Explain simpler</button>
+          <button type="button" class="pill-btn" data-type="why">❓ Why is this correct?</button>
+        </div>
+        <form id="followupForm" class="followup-form">
+          <input type="text" id="followupInput" placeholder="Ask a follow-up question..." required class="form-input" />
+          <button type="submit" class="btn btn-primary" id="followupSubmitBtn">Ask</button>
+        </form>
+        <div class="followup-result hidden" id="followupResult"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal for Manual Details Entry -->
+  <div class="modal-overlay hidden" id="manualDetailsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Manual Paper Details</h3>
+        <button type="button" class="close-modal-btn" id="closeModalBtn">&times;</button>
+      </div>
+      <form id="manualDetailsForm" class="modal-form">
+        <div class="form-group">
+          <label for="boardSelect">Exam Board</label>
+          <select id="boardSelect" class="form-input">
+            <option value="cambridge">Cambridge (CAIE)</option>
+            <option value="edexcel">Edexcel</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="syllabusInput">Syllabus / Subject Code (e.g. 0610 or 4MA1)</label>
+          <input type="text" id="syllabusInput" class="form-input" placeholder="0610" required />
+        </div>
+        <div class="form-group">
+          <label for="paperNumInput">Paper Number (e.g. 42 or 1H)</label>
+          <input type="text" id="paperNumInput" class="form-input" placeholder="42" required />
+        </div>
+        <div class="form-group">
+          <label for="sessionInput">Session</label>
+          <select id="sessionInput" class="form-input">
+            <option value="May/June">May/June (Summer)</option>
+            <option value="Oct/Nov">Oct/Nov (Winter)</option>
+            <option value="March">March</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="yearInput">Year</label>
+          <input type="number" id="yearInput" class="form-input" placeholder="2023" value="2023" required />
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="cancelModalBtn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Find Mark Scheme</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
